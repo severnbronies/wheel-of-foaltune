@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,600">
+	<title>Wheel of Foaltune</title>
+</head>
+<body>
+
+	<div id="app">
+
+		<button type="button" v-on:click="toggleWheel" class="wheel-button">Wheel</button>
+
+		<div class="wheel-popover" v-if="showWheel">
+			<button class="wheel-popover__button" type="button" v-on:click="spinWheel('cw')">SPIN!</button>
+			<div class="wheel">
+				<div class="wheel__spinner" v-bind:style="'transform: rotate(' + wheelSpinDegs + 'deg);'">
+					<div class="wheel__segment" v-for="seg in wheelSegments">
+						<span><template v-if="seg === 'S'">Skip</template>
+						<template v-else-if="seg === 'B'">Lose</template>
+						<template v-else>{{ seg }}pt</template></span>
+					</div>
+					<div class="wheel__middle"><img src="logo.png"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="board">
+			<template v-for="(word, index) in phrase">
+				<span class="board__letter board__letter--space" v-if="index !== 0">&nbsp;</span><span class="board__word">
+					<span class="board__letter" v-for="item in word" v-bind:hidden="!item.visible">{{ item.char }}</span>
+				</span>
+			</template>
+		</div>
+
+		<div class="clue">{{ clue }}</div>
+
+		<div class="controls">
+			<div class="controls__grid">
+				<button class="controls__button" type="button" v-for="(used, letter) in alphabetUsed" v-bind:disabled="used" v-on:click="activateLetter(letter)">{{ letter }}</button>
+			</div>
+			<button class="controls__button controls__button--solve" type="button" v-on:click="showBoard">Solve</button>
+		</div>
+
+	</div>
+
+	<script src="vue.js"></script>
+	<script>
+		const questions = [
+			{ clue: "Phrase/Quotation", phrase: "I just don't know what went wrong" },
+			{ clue: "On The Map", phrase: "Neighagra Falls" },
+			{ clue: "Husband & Wife", phrase: "Twilight Velvet & Night Light" },
+			{ clue: "Person", phrase: "Sea Serpent Steven Magnet" },
+			{ clue: "What are you doing?", phrase: "Being twenty percent cooler" }
+		];
+		const app = new Vue({
+			el: '#app',
+			data: {
+				showWheel: false,
+				wheelSpinDegs: 0,
+				wheelSpinDuration: 0,
+				clue: '',
+				phrase: [],
+				alphabetUsed: {
+					A: false,
+					B: false,
+					C: false,
+					D: false,
+					E: false,
+					F: false,
+					G: false,
+					H: false,
+					I: false,
+					J: false,
+					K: false,
+					L: false,
+					M: false,
+					N: false,
+					O: false,
+					P: false,
+					Q: false,
+					R: false,
+					S: false,
+					T: false,
+					U: false,
+					V: false,
+					W: false,
+					X: false,
+					Y: false,
+					Z: false
+				},
+				wheelSegments: ['S', 5, 1, 2, 4, 1, 3, 2, 1, 3, 1, 2, 5, 3, 1, 2, 6, 2, 4, 6, 'B', 3, 2, 1]
+			},
+			mounted() {
+				let item;
+				const urlParams = new URLSearchParams(window.location.search);
+				if(urlParams.get('q')) {
+					item = questions[urlParams.get('q')];
+				}
+				else {
+					item = questions[Math.floor(Math.random() * questions.length)];
+				}
+				this.phrase = this.parsePhrase(item.phrase);
+				console.log(this.phrase);
+				this.clue = item.clue;
+			},
+			methods: {
+				toggleWheel: function() {
+					if(this.showWheel === false) {
+						this.showWheel = true;
+						return;
+					}
+					this.showWheel = false;
+				},
+				parsePhrase: function(phrase) {
+					const words = phrase.split(' ');
+					const wordArray = [];
+					words.forEach((word) => {
+						const characters = word.split('');
+						const letterArray = [];
+						characters.forEach((char) => { 
+							let visible = true;
+							char = char.toUpperCase();
+							if(char.match(/[A-Z]/)) {
+								visible = false;
+							}
+							letterArray.push({
+								char: char,
+								visible: visible
+							});
+						});
+						wordArray.push(letterArray);
+					});
+					return wordArray;
+				},
+				activateLetter: function(activatedLetter) {
+					this.phrase.forEach((word) => {
+						word.forEach((letter) => {
+							if(letter.char === activatedLetter) {
+								letter.visible = true;
+							}
+						});
+					});
+					this.alphabetUsed[activatedLetter] = true;
+				},
+				showBoard: function() {
+					this.phrase.forEach((word) => {
+						word.forEach((letter) => {
+							letter.visible = true;
+						});
+					});
+				},
+				spinWheel: function(dir = 'cw') {
+					const min = 365;
+					const max = 1825;
+					let randomQuantity = Math.floor(Math.random() * (max - min + 1) + min);
+					if(dir === 'ccw') {
+						randomQuantity = 0 - randomQuantity;
+					}
+					this.wheelSpinDegs += randomQuantity;
+					this.wheelSpinDuration = randomQuantity / 100;
+				}
+			}
+		});
+	</script>
+	
+</body>
+</html>

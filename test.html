@@ -1,0 +1,64 @@
+<input id="patientPercentage" placeholder="Enter %" type="number" min="0" max="99">
+<input id="patientAge" placeholder="Enter age" type="number" min="0" max="99">
+<div id="diagnosis"></div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+  var diagnosis = "This is my diagnosis"
+diagnosisSelector = (Math.random() * 100)
+if (diagnosisSelector > 90){
+  diagnosis = "This is diagnosis statement 1"
+}
+else if (diagnosisSelector >= 80){
+  diagnosis = "This is number 2"
+}
+
+else if (diagnosisSelector >= 70){
+  diagnosis = "I'm a dentist"
+}
+
+else if (diagnosisSelector >= 60){
+  diagnosis = "This is number 3"
+}
+
+else if (diagnosisSelector >= 50){
+  diagnosis = "Massi smells"
+}
+
+else if (diagnosisSelector >= 40){
+  diagnosis = "Number 4"
+}
+
+else if (diagnosisSelector >= 30){
+  diagnosis = "This is number 5"
+}
+
+else if (diagnosisSelector >= 20){
+  diagnosis = "This is number 6"
+}
+
+else if (diagnosisSelector >= 10){
+  diagnosis = "This is number 7"
+}
+
+document.getElementById("diagnosis").innerHTML = diagnosis;
+
+  
+
+$("#patientPercentage").on('input',() => {
+  console.log(updateDiagnosis());
+});
+
+$("#patientAge").on('input',() => {
+  console.log(updateDiagnosis());
+});
+
+function updateDiagnosis() {
+  var patientAge = parseInt($('#patientAge').val());
+  var patientPercentage = parseInt($('#patientPercentage').val());
+  console.log(patientPercentage, patientAge)
+  return patientAge / patientPercentage;
+}
+
+
+</script>
